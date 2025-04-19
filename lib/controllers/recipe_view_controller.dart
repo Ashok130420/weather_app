@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../models/recipe_model.dart';
 import '../services/database_helper.dart';
+import '../views/recipe_details_view.dart';
 
 class RecipeController extends GetxController {
   final TextEditingController ingredientController = TextEditingController();
@@ -24,12 +26,12 @@ class RecipeController extends GetxController {
     final defaultIngredients = "chicken,tomato,onion";
     final url = 'https://api.spoonacular.com/recipes/findByIngredients?ingredients=$defaultIngredients&number=10&apiKey=$_apiKey';
 
-    print("Fetching default recipes from: $url");
+    log("Fetching default recipes from: $url");
 
     try {
       final response = await http.get(Uri.parse(url));
-      print("Response Status: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      log("Response Status: ${response.statusCode}");
+      log("Response Body >>> ${response.body}");
 
       if (response.statusCode == 200) {
         final List data = jsonDecode(response.body);
@@ -38,7 +40,7 @@ class RecipeController extends GetxController {
         Get.snackbar('Error', 'Failed to load default recipes');
       }
     } catch (e) {
-      print("Fetch default recipes error: $e");
+      log("Fetch default recipes error: $e");
       Get.snackbar('Error', e.toString());
     } finally {
       isLoading.value = false;
@@ -80,30 +82,6 @@ class RecipeController extends GetxController {
     }
   }
 
-  void fetchRecipeDetails(int recipeId) async {
-    final url = 'https://api.spoonacular.com/recipes/$recipeId/information?includeNutrition=false&apiKey=$_apiKey';
-
-    print("Fetching recipe details for ID: $recipeId");
-    print("URL: $url");
-
-    try {
-      final response = await http.get(Uri.parse(url));
-      print("Response Status: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final recipe = RecipeModel.fromMap(data);
-        showRecipeDetailsDialog(recipe);
-      } else {
-        Get.snackbar('Error', 'Failed to fetch recipe details');
-      }
-    } catch (e) {
-      print("Fetch recipe details error: $e");
-      Get.snackbar('Error', e.toString());
-    }
-  }
-
   void showRecipeDetailsDialog(RecipeModel recipe) {
     Get.defaultDialog(
       title: recipe.title ?? "",
@@ -114,7 +92,7 @@ class RecipeController extends GetxController {
             Image.network(recipe.image ?? ""),
             SizedBox(height: 10),
             Text("Ingredients", style: TextStyle(fontWeight: FontWeight.bold)),
-            ...recipe.ingredients!.map((ing) => Text("- $ing")).toList(),
+            ...recipe.extendedIngredients!.map((ing) => Text("- $ing")).toList(),
             SizedBox(height: 10),
             Text("Instructions", style: TextStyle(fontWeight: FontWeight.bold)),
             Text(recipe.instructions ?? 'No instructions available.'),
