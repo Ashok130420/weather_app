@@ -64,8 +64,7 @@ class _CustomTextInputState extends State<CustomTextInput> {
       minLines: widget.minLines ?? 1,
       maxLines: widget.maxLines ?? 1,
       inputFormatters: [
-        if (widget.maxLength != null)
-          LengthLimitingTextInputFormatter(widget.maxLength),
+        if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength),
       ],
       decoration: InputDecoration(
         fillColor: AppColors.white,
@@ -100,9 +99,9 @@ class _CustomTextInputState extends State<CustomTextInput> {
         alignLabelWithHint: true,
         suffixIcon: widget.suffixIcon != null
             ? GestureDetector(
-          onTap: widget.onSuffixIconPressed,
-          child: widget.suffixIcon,
-        )
+                onTap: widget.onSuffixIconPressed,
+                child: widget.suffixIcon,
+              )
             : null,
       ),
     );

@@ -92,7 +92,7 @@ class RecipeController extends GetxController {
             Image.network(recipe.image ?? ""),
             SizedBox(height: 10),
             Text("Ingredients", style: TextStyle(fontWeight: FontWeight.bold)),
-            ...recipe.extendedIngredients!.map((ing) => Text("- $ing")).toList(),
+            ...recipe.extendedIngredients!.map((ing) => Text("- $ing")),
             SizedBox(height: 10),
             Text("Instructions", style: TextStyle(fontWeight: FontWeight.bold)),
             Text(recipe.instructions ?? 'No instructions available.'),

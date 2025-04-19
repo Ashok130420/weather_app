@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:weather/services/location_service.dart';
 
-import 'views/home_view.dart';
+import 'views/dashboard_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Recipe & Weather App',
       theme: ThemeData(primarySwatch: Colors.green),
-      home: HomeScreen(),
+      home: DashboardView(),
     );
   }
 }

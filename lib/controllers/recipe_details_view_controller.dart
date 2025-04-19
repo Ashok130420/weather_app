@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather/controllers/favorite_view_controller.dart';
 import '../models/recipe_model.dart';
 import '../services/database_helper.dart';
 import '../utils/status_messages.dart';
@@ -50,7 +50,8 @@ class RecipeDetailsViewController extends GetxController {
   Future<void> saveToFavorites() async {
     if (recipe.value != null) {
       await DatabaseHelper.instance.insertRecipe(recipe.value!);
-      Get.snackbar('Saved', 'Recipe added to favorites');
+      Get.find<FavoriteViewController>().onInit();
+      showSuccessMessage("Recipe added to favorites");
     }
   }
 }

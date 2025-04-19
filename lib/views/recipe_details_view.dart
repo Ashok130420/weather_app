@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:weather/controllers/recipe_details_view_controller.dart';
 import 'package:flutter/material.dart';
-import '../services/database_helper.dart';
 import 'package:html/parser.dart' as html_parser;
+import 'package:weather/widgets/custom_button.dart';
 
 import '../utils/app_colors.dart';
 
@@ -44,19 +44,34 @@ class RecipeDetailsView extends StatelessWidget {
               children: [
                 if (recipe.image != null) Image.network(recipe.image!, fit: BoxFit.cover),
                 const SizedBox(height: 10),
-                const Text("Ingredients", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                ...?recipe.extendedIngredients?.map((ing) => Text("- $ing")),
+                Row(
+                  children: [
+                    Expanded(flex: 2, child: Text("${recipe.title}", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
+                    Expanded(
+                      flex: 1,
+                      child: CustomButton(
+                        onPressed: () {
+                          controller.saveToFavorites();
+                        },
+                        title: "Favorite",
+                        borderRadius: BorderRadius.circular(50),
+                        bgColor: AppColors.black,
+                        icon: const Icon(
+                          Icons.favorite,
+                          size: 30,
+                          color: AppColors.white,
+                        ),
+                      ),
+
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 10),
                 const Text("Instructions", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text(html_parser.parse(recipe.instructions ?? '').body?.text.trim() ?? 'No instructions available.'),
                 const Text("Ready In ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text("${recipe.readyInMinutes} min", style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16)),
                 const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.favorite),
-                  label: const Text("Save to Favorites"),
-                  onPressed: controller.saveToFavorites,
-                ),
               ],
             ),
           );

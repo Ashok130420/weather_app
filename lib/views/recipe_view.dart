@@ -5,7 +5,6 @@ import 'package:weather/controllers/recipe_view_controller.dart';
 import 'package:weather/views/recipe_details_view.dart';
 import '../utils/app_colors.dart';
 import '../widgets/custom_input_text.dart';
-import 'favorite_view.dart';
 
 class RecipeScreen extends StatelessWidget {
   RecipeScreen({super.key});
@@ -16,14 +15,6 @@ class RecipeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-          title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text("Recipe Finder"),
-          InkWell(onTap: () => Get.to(() => FavoriteView()), child: Text("favorites")),
-        ],
-      )),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
@@ -55,28 +46,6 @@ class RecipeScreen extends StatelessWidget {
               },
             ),
             SizedBox(height: 10),
-            // Obx(() {
-            //   if (controller.isLoading.value) {
-            //     return Center(child: CircularProgressIndicator());
-            //   }
-            //   if (controller.recipes.isEmpty) {
-            //     return Expanded(child: Center(child: Text("No recipes found")));
-            //   }
-            //   return Expanded(
-            //       child: ListView.builder(
-            //     itemCount: controller.recipes.length,
-            //     itemBuilder: (context, index) {
-            //       final recipe = controller.recipes[index];
-            //       return ListTile(
-            //           leading: Image.network(recipe.image ?? "", width: 50),
-            //           title: Text(recipe.title ?? ""),
-            //           subtitle: Text('Ready in ${recipe.readyInMinutes ?? 'N/A'} mins'),
-            //           onTap: () {
-            //             Get.to(() => RecipeDetailsView(), arguments: [recipe.id]);
-            //           });
-            //     },
-            //   ));
-            // }),
             Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
