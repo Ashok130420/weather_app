@@ -58,6 +58,9 @@ class WeatherScreen extends StatelessWidget {
                           child: TextFormField(
                             controller: controller.cityController,
                             style: const TextStyle(color: AppColors.white),
+                            onFieldSubmitted: (value) {
+                              controller.getWeatherByCity();
+                            },
                             decoration: InputDecoration(
                               hintText: 'Search city...',
                               hintStyle: TextStyle(color: AppColors.white),
@@ -99,101 +102,6 @@ class WeatherScreen extends StatelessWidget {
                     ),
                   ),
                   Height(height: Get.height * 0.03),
-                  // Obx(() {
-                  //   if (controller.isLoading.value) {
-                  //     return const Center(
-                  //       child: CupertinoActivityIndicator(
-                  //         radius: 20,
-                  //         color: AppColors.white,
-                  //       ),
-                  //     );
-                  //   }
-                  //
-                  //   if (controller.weather.value == null) {
-                  //     return Center(
-                  //       child: Column(
-                  //         children: [
-                  //           Icon(
-                  //             Icons.cloud_off,
-                  //             size: Get.width * 0.2,
-                  //             color: AppColors.white.withValues(alpha: 0.7),
-                  //           ),
-                  //           const SizedBox(height: 16),
-                  //           CustomText(
-                  //             'No weather data available',
-                  //             color: AppColors.white.withValues(alpha: 0.7),
-                  //             fontSize: Get.width * 0.045,
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     );
-                  //   }
-                  //
-                  //   final weather = controller.weather.value!;
-                  //   return TweenAnimationBuilder<double>(
-                  //     tween: Tween(begin: 0.0, end: 1.0),
-                  //     duration: const Duration(milliseconds: 500),
-                  //     builder: (context, value, child) {
-                  //       return Transform.scale(
-                  //         scale: value,
-                  //         child: Container(
-                  //           padding: EdgeInsets.all(Get.width * 0.05),
-                  //           decoration: BoxDecoration(
-                  //             color: AppColors.white.withValues(alpha: 0.2),
-                  //             borderRadius: BorderRadius.circular(20),
-                  //             boxShadow: [
-                  //               BoxShadow(
-                  //                 color: AppColors.darkerGrey.withValues(alpha: 0.1),
-                  //                 blurRadius: 10,
-                  //                 offset: const Offset(0, 5),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //           child: Column(
-                  //             children: [
-                  //               CustomText(
-                  //                 weather.city ?? "",
-                  //                 fontSize: 40,
-                  //                 fontWeight: FontWeight.bold,
-                  //                 color: AppColors.white,
-                  //               ),
-                  //               Image.network(
-                  //                 weather.iconUrl ?? "",
-                  //                 width: 150,
-                  //                 height: 150,
-                  //                 fit: BoxFit.contain,
-                  //               ),
-                  //               CustomText(
-                  //                 weather.description ?? '',
-                  //                 fontSize: Get.width * 0.045,
-                  //                 color: AppColors.white,
-                  //               ),
-                  //               SizedBox(height: Get.height * 0.02),
-                  //               Row(
-                  //                 mainAxisAlignment: MainAxisAlignment.center,
-                  //                 children: [
-                  //                   CustomText(
-                  //                     '${weather.temperature}°',
-                  //                     fontSize: Get.width * 0.12,
-                  //                     fontWeight: FontWeight.bold,
-                  //                     color: AppColors.white,
-                  //                   ),
-                  //                   CustomText(
-                  //                     'C',
-                  //                     fontSize: Get.width * 0.06,
-                  //                     fontWeight: FontWeight.bold,
-                  //                     color: AppColors.white,
-                  //                   ),
-                  //                 ],
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       );
-                  //     },
-                  //   );
-                  // }),
-
                   Obx(() {
                     if (controller.isLoading.value) {
                       return const Center(
@@ -293,33 +201,32 @@ class WeatherScreen extends StatelessWidget {
                       },
                     );
                   }),
-
                   Height(height: Get.height * 0.04),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: Get.width * 0.02),
+                  Obx(() {
+                    if (controller.forecast.isEmpty) {
+                      return Center(
                         child: CustomText(
-                          'Weather forecast next days',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.white,
+                          'No forecast available',
+                          color: AppColors.white.withValues(alpha: 0.7),
+                          fontSize: Get.width * 0.04,
                         ),
-                      ),
-                      Height(height: Get.height * 0.02),
-                      Obx(() {
-                        if (controller.forecast.isEmpty) {
-                          return Center(
-                            child: CustomText(
-                              'No forecast available',
-                              color: AppColors.white.withValues(alpha: 0.7),
-                              fontSize: Get.width * 0.04,
-                            ),
-                          );
-                        }
+                      );
+                    }
 
-                        return SizedBox(
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: Get.width * 0.02),
+                          child: CustomText(
+                            'Weather forecast next days',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.white,
+                          ),
+                        ),
+                        Height(height: Get.height * 0.02),
+                        SizedBox(
                           height: Get.height * 0.22,
                           child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
@@ -382,10 +289,10 @@ class WeatherScreen extends StatelessWidget {
                               );
                             },
                           ),
-                        );
-                      }),
-                    ],
-                  ),
+                        ),
+                      ],
+                    );
+                  })
                 ],
               ),
             ),

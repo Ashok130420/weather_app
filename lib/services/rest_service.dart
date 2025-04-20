@@ -37,35 +37,6 @@ class RestHelper {
     }
   }
 
-  // static Future<Map<String, dynamic>> getRequest(String url,
-  //     { bool useCache = false, bool authorization = false}) async {
-  //   try {
-  //     var headers = {
-  //       "Content-Type": "application/json",
-  //     };
-  //     if (authorization) {
-  //       var token = await CacheService.readCache(key: Constants.token);
-  //       headers["Authorization"] = "bearer $token";
-  //     }
-  //
-  //     if (useCache && _cacheMap.containsKey(url)) {
-  //       return jsonDecode(_cacheMap[url]!);
-  //     }
-  //
-  //     var response = await get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 20), onTimeout: () {
-  //       throw FetchDataException("Request timeout");
-  //     });
-  //
-  //     log("Response for $url : ${response.body}", name: "REST");
-  //
-  //     if (useCache) _cacheMap[url] = response.body;
-  //     return _processResponse(response);
-  //   } on SocketException {
-  //     throw FetchDataException("No Internet connection");
-  //   } catch (e) {
-  //     throw AppException(900, "Unexpected error occurred", e.toString());
-  //   }
-  // }
 
   static Future<dynamic> getRequest(String url,
       {bool useCache = false, bool authorization = false}) async {

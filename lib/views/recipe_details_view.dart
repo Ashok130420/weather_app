@@ -52,11 +52,10 @@ class RecipeDetailsView extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      flex: 2,
                       child: CustomText("${recipe.title}", fontWeight: FontWeight.bold, fontSize: 16),
                     ),
+                    Width(width: 10),
                     Expanded(
-                      flex: 1,
                       child: ElevatedButton(
                         onPressed: () {
                           controller.saveToFavorites();

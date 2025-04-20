@@ -7,6 +7,7 @@ import 'package:weather/services/rest_service.dart';
 import 'package:weather/utils/status_messages.dart';
 import '../models/weather_model.dart';
 import '../models/forecast_weather_model.dart';
+import '../utils/assets.dart';
 import '../utils/constants.dart';
 
 class WeatherController extends GetxController {
@@ -59,7 +60,7 @@ class WeatherController extends GetxController {
     try {
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       log('Location permission granted! Lat: ${position.latitude}, Lon: ${position.longitude}');
-      await getWeatherByCoords(position.latitude, position.longitude);
+      await getWeatherByLatLon(position.latitude, position.longitude);
       await getForecastByCoords(position.latitude, position.longitude);
     } catch (e) {
       log('Location Error: $e');
@@ -90,13 +91,13 @@ class WeatherController extends GetxController {
     }
   }
 
-  Future<void> getWeatherByCoords(double lat, double lon) async {
+  Future<void> getWeatherByLatLon(double lat, double lon) async {
     isLoading.value = true;
     final url = '${Constants.openWeatherMapBaseUrl}weather?lat=$lat&lon=$lon&appid=${Constants.weatherApiKey}&units=metric';
 
     try {
       final data = await RestHelper.getRequest(url);
-      log('Weather API Success (Coords): $data');
+      log('Weather API Success : $data');
       weather.value = Weather(
         city: data['name'],
         description: data['weather'][0]['description'],
@@ -155,17 +156,17 @@ class WeatherController extends GetxController {
       case 'haze':
       case 'dust':
       case 'fog':
-        return 'assets/weather/cloud.json';
+        return Assets.cloudWeather;
       case 'rain':
       case 'drizzle':
       case 'shower rain':
-        return 'assets/weather/rain.json';
+        return Assets.rainWeather;
       case 'thunderstorm':
-        return 'assets/weather/thunder.json';
+        return Assets.thunderWeather;
       case 'clear':
-        return 'assets/weather/sun.json';
+        return Assets.sunWeather;
       default:
-        return 'assets/weather/sun.json';
+        return Assets.sunWeather;
     }
   }
 
@@ -179,7 +180,7 @@ class WeatherController extends GetxController {
       return Colors.lightBlue.shade100;
     } else if (hour >= 12 && hour < 17) {
       if (description.contains('rain')) return Colors.grey.shade400;
-      return Colors.yellow.shade300;
+      return Colors.yellow.shade500;
     } else if (hour >= 17 && hour < 20) {
       return Colors.deepOrange.shade200;
     } else {

@@ -41,6 +41,12 @@ class RecipeScreen extends StatelessWidget {
                         child: TextFormField(
                           controller: controller.recipeController,
                           style: const TextStyle(color: AppColors.grey),
+                          onChanged: (value) {
+                            controller.filterRecipesByTitle(value);
+                          },
+                          onFieldSubmitted: (value) {
+                            controller.filterRecipesByTitle(value);
+                          },
                           decoration: InputDecoration(
                             hintText: 'Search recipe by ingredients',
                             hintStyle: TextStyle(color: AppColors.grey),
@@ -65,7 +71,7 @@ class RecipeScreen extends StatelessWidget {
                                 scale: value,
                                 child: IconButton(
                                   icon: const Icon(Icons.search, color: AppColors.darkerGrey),
-                                  onPressed: controller.fetchRecipes,
+                                  onPressed: () {},
                                 ),
                               );
                             },

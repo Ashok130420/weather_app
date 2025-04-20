@@ -16,11 +16,6 @@ void showErrorMessage(
     backgroundColor: const Color.fromARGB(255, 249, 206, 203),
     borderWidth: 1,
     borderColor: Color.fromARGB(255, 249, 206, 203),
-    // mainButton: CloseButton(
-    //   onPressed: () async {
-    //     await Get.closeCurrentSnackbar();
-    //   },
-    // ),
     icon: const Icon(
       Icons.error_outline,
       color: Colors.red,
@@ -74,13 +69,7 @@ void showSuccessMessage(
     backgroundColor: const Color.fromARGB(255, 204, 255, 206),
     borderWidth: 1,
     borderColor: Color.fromARGB(255, 204, 255, 206),
-    // mainButton: CloseButton(
-    //   onPressed: () async {
-    //     await Get.closeCurrentSnackbar();
-    //   },
-    // ),
     icon: const Icon(
-      // Icons.verified_outlined,
       Icons.done,
       color: Colors.green,
     ),
