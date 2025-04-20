@@ -38,6 +38,8 @@ dependencies:
   sqflite: ^2.4.1
   path: ^1.9.0
   flutter_html: ^3.0.0
+  shared_preferences: ^2.5.3
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -62,8 +64,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/weather/
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

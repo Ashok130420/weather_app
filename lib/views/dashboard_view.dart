@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:weather/controllers/dashboard_view_controller.dart';
 import 'package:weather/utils/app_colors.dart';
+import 'package:weather/utils/size_space.dart';
 import 'package:weather/views/favorite_view.dart';
 import 'package:weather/views/recipe_view.dart';
 import 'package:weather/views/weather_view.dart';
@@ -16,22 +17,19 @@ class DashboardView extends StatelessWidget {
     final List<Widget> tabs = [WeatherScreen(), RecipeScreen(), FavoriteView()];
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        title: Text('Recipe & Weather App'),
-      ),
-      body: Obx(
-        () => PageView(
-          children: [tabs[controller.currentIndexNavBottom.value]],
+      body: SafeArea(
+        child: Obx(
+          () => PageView(
+            children: [tabs[controller.currentIndexNavBottom.value]],
+          ),
         ),
       ),
       bottomNavigationBar: Obx(
         () => Container(
           height: 70,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-            boxShadow: const [
-              BoxShadow(spreadRadius: 0.0, color: AppColors.bottomNavColor, blurRadius: 0.0, offset: Offset(0, -1)),
-            ],
+
+
             color: AppColors.bottomNavColor,
           ),
           child: Row(
@@ -56,7 +54,7 @@ class DashboardView extends StatelessWidget {
                         height: 4,
                         width: 80,
                       ),
-                      SizedBox(height: 7),
+                      Height(height: 7),
                       Icon(Icons.device_thermostat,
                           size: 32, color: controller.currentIndexNavBottom.value == 0 ? AppColors.black : AppColors.grey),
                       Text("Weather",
@@ -82,7 +80,7 @@ class DashboardView extends StatelessWidget {
                         height: 4,
                         width: 80,
                       ),
-                      SizedBox(height: 7),
+                      Height(height: 7),
                       Icon(Icons.fastfood, size: 32, color: controller.currentIndexNavBottom.value == 1 ? AppColors.black : AppColors.grey),
                       Text("Recipes",
                           style: TextStyle(color: controller.currentIndexNavBottom.value == 1 ? AppColors.black : AppColors.grey)),
@@ -107,7 +105,7 @@ class DashboardView extends StatelessWidget {
                         height: 4,
                         width: 80,
                       ),
-                      SizedBox(height: 7),
+                      Height(height: 7),
                       Icon(Icons.favorite, size: 32, color: controller.currentIndexNavBottom.value == 2 ? AppColors.black : AppColors.grey),
                       Text("Favorites",
                           style: TextStyle(color: controller.currentIndexNavBottom.value == 2 ? AppColors.black : AppColors.grey)),

@@ -30,15 +30,16 @@ class DatabaseHelper {
   // Create favorites table
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE $_tableName (
-        id INTEGER PRIMARY KEY,
-        title TEXT,
-        image TEXT,
-        readyInMinutes INTEGER,
-        ingredients TEXT,
-        instructions TEXT
-      )
-    ''');
+    CREATE TABLE $_tableName (
+      id INTEGER PRIMARY KEY,
+      likes TEXT,
+      title TEXT,
+      image TEXT,
+      readyInMinutes INTEGER,
+      ingredients TEXT,
+      instructions TEXT
+    )
+  ''');
   }
 
   // Insert

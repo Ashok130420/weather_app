@@ -1,7 +1,7 @@
-import 'dart:convert';
 
 class RecipeModel {
   final int? id;
+  final int? likes;
   final String? title;
   final String? image;
   final int? readyInMinutes;
@@ -10,6 +10,7 @@ class RecipeModel {
 
   RecipeModel({
     this.id,
+    this.likes,
     this.title,
     this.image,
     this.readyInMinutes,
@@ -20,6 +21,7 @@ class RecipeModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'likes': likes,
       'title': title,
       'image': image,
       'readyInMinutes': readyInMinutes,
@@ -31,6 +33,7 @@ class RecipeModel {
   factory RecipeModel.fromMap(Map<String, dynamic> map) {
     return RecipeModel(
       id: map['id'],
+      likes: map['likes'],
       title: map['title'],
       image: map['image'],
       readyInMinutes: map['readyInMinutes'],

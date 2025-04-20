@@ -4,7 +4,7 @@ import '../services/database_helper.dart';
 
 class FavoriteViewController extends GetxController {
   var favoriteItems = <RecipeModel>[].obs;
-
+  var isLoading = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -12,8 +12,10 @@ class FavoriteViewController extends GetxController {
   }
 
   Future<void> loadFavorites() async {
+    isLoading.value = true;
     final recipes = await DatabaseHelper.instance.getFavoriteRecipes();
     favoriteItems.assignAll(recipes);
+    isLoading.value = false;
   }
 
   Future<void> removeFromFavorites(int id) async {

@@ -1,12 +1,13 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:weather/models/weather_model.dart';
-
+import 'package:weather/services/app_exception.dart';
+import 'package:weather/services/rest_service.dart';
+import 'package:weather/utils/status_messages.dart';
+import '../models/weather_model.dart';
 import '../models/forecast_weather_model.dart';
+import '../utils/constants.dart';
 
 class WeatherController extends GetxController {
   final TextEditingController cityController = TextEditingController();
@@ -14,31 +15,30 @@ class WeatherController extends GetxController {
   final weather = Rxn<Weather>();
   final forecast = <ForecastWeather>[].obs;
 
-  static const String _apiKey = 'f35944a2f733d5d3bce0dbf83997095c';
-
   @override
   void onInit() {
     super.onInit();
-    fetchWeatherByLocation(); // Automatically fetch weather when controller is initialized
+    getWeatherByLocation();
   }
 
-  Future<void> fetchWeatherByCity() async {
+  Future<void> getWeatherByCity() async {
     final city = cityController.text.trim();
     if (city.isEmpty) {
-      Get.snackbar('Error', 'Please enter a city name');
+      showErrorMessage('Error, Please enter a city name');
       return;
     }
-    await _fetchWeather(city);
-    await _fetchForecastByCity(city); // Fetch forecast when city is entered
+
+    await getWeather(city);
+    await getForecastByCity(city);
   }
 
-  Future<void> fetchWeatherByLocation() async {
+  Future<void> getWeatherByLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Get.snackbar('Error', 'Location services are disabled.');
+      showErrorMessage('Error ,Location services are disabled.');
       return;
     }
 
@@ -46,111 +46,126 @@ class WeatherController extends GetxController {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Get.snackbar('Error', 'Location permissions are denied.');
+        showErrorMessage('Error, Location permissions are denied.');
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      Get.snackbar('Error', 'Location permissions are permanently denied.');
+      showErrorMessage('Error, Location permissions are permanently denied.');
       return;
     }
 
     try {
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      log('Location permission granted! Lat: ${position.latitude}, Lon: ${position.longitude}');
+      await getWeatherByCoords(position.latitude, position.longitude);
+      await getForecastByCoords(position.latitude, position.longitude);
+    } catch (e) {
+      log('Location Error: $e');
+      showErrorMessage('Location Error $e');
+    }
+  }
+
+  Future<void> getWeather(String city) async {
+    isLoading.value = true;
+    final encodedCity = Uri.encodeComponent(city);
+    final url = '${Constants.openWeatherMapBaseUrl}weather?q=$encodedCity,IN&appid=${Constants.weatherApiKey}&units=metric';
+
+    try {
+      final data = await RestHelper.getRequest(url);
+      log('Weather API Success (City): $data');
+      weather.value = Weather(
+        city: data['name'],
+        description: data['weather'][0]['description'],
+        temperature: data['main']['temp'].toDouble(),
+        iconUrl: 'https://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png',
+        condition: data['weather'][0]['main'],
       );
-      await _fetchWeatherByCoords(position.latitude, position.longitude);
-      await _fetchForecastByCoords(position.latitude, position.longitude); // Fetch forecast based on location
     } catch (e) {
-      Get.snackbar('Error', 'Failed to get location: $e');
-    }
-  }
-
-  Future<void> _fetchWeather(String city) async {
-    isLoading.value = true;
-    final encodedCity = Uri.encodeComponent(city);
-    final url = 'https://api.openweathermap.org/data/2.5/weather?q=$encodedCity,IN&appid=$_apiKey&units=metric';
-
-    try {
-      final response = await http.get(Uri.parse(url));
-      print('City Weather Response: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        weather.value = Weather(
-          city: data['name'],
-          description: data['weather'][0]['description'],
-          temperature: data['main']['temp'].toDouble(),
-          iconUrl: 'https://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png',
-        );
-      } else {
-        final error = jsonDecode(response.body);
-        Get.snackbar('Error', error['message'] ?? 'Failed to fetch weather');
-      }
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch weather: $e');
+      log('Weather API Failure: $e');
+      handleException(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> _fetchWeatherByCoords(double lat, double lon) async {
+  Future<void> getWeatherByCoords(double lat, double lon) async {
     isLoading.value = true;
-    final url = 'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$_apiKey&units=metric';
+    final url = '${Constants.openWeatherMapBaseUrl}weather?lat=$lat&lon=$lon&appid=${Constants.weatherApiKey}&units=metric';
 
     try {
-      final response = await http.get(Uri.parse(url));
-      print('Coords Weather Response: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        weather.value = Weather(
-          city: data['name'],
-          description: data['weather'][0]['description'],
-          temperature: data['main']['temp'].toDouble(),
-          iconUrl: 'https://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png',
-        );
-      } else {
-        final error = jsonDecode(response.body);
-        Get.snackbar('Error', error['message'] ?? 'Failed to fetch weather');
-      }
+      final data = await RestHelper.getRequest(url);
+      log('Weather API Success (Coords): $data');
+      weather.value = Weather(
+        city: data['name'],
+        description: data['weather'][0]['description'],
+        temperature: data['main']['temp'].toDouble(),
+        iconUrl: 'https://openweathermap.org/img/wn/${data['weather'][0]['icon']}@2x.png',
+        condition: data['weather'][0]['main'],
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch weather: $e');
+      log('Weather API Failure: $e');
+      handleException(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> _fetchForecastByCity(String city) async {
+  Future<void> getForecastByCity(String city) async {
     final encodedCity = Uri.encodeComponent(city);
-    final url = 'https://api.openweathermap.org/data/2.5/forecast?q=$encodedCity,IN&appid=$_apiKey&units=metric';
-
-    await _fetchForecast(url);
+    final url = '${Constants.openWeatherMapBaseUrl}forecast?q=$encodedCity,IN&appid=${Constants.weatherApiKey}&units=metric';
+    await getForecast(url);
   }
 
-  Future<void> _fetchForecastByCoords(double lat, double lon) async {
-    final url = 'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$_apiKey&units=metric';
-
-    await _fetchForecast(url);
+  Future<void> getForecastByCoords(double lat, double lon) async {
+    final url = '${Constants.openWeatherMapBaseUrl}forecast?lat=$lat&lon=$lon&appid=${Constants.weatherApiKey}&units=metric';
+    await getForecast(url);
   }
 
-  Future<void> _fetchForecast(String url) async {
+  Future<void> getForecast(String url) async {
     try {
-      final response = await http.get(Uri.parse(url));
-      log('Forecast Response >>> ${response.body}');
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final List<dynamic> list = data['list'];
-        final List<ForecastWeather> forecastList =
-            list.where((item) => item['dt_txt'].toString().contains('12:00:00')).map((item) => ForecastWeather.fromJson(item)).toList();
-        forecast.assignAll(forecastList);
-      } else {
-        final error = jsonDecode(response.body);
-        Get.snackbar('Error', error['message'] ?? 'Failed to fetch forecast');
-      }
+      final data = await RestHelper.getRequest(url);
+      log('Forecast API Success: $data');
+      final List<dynamic> list = data['list'];
+      final forecastList =
+          list.where((item) => item['dt_txt'].toString().contains('12:00:00')).map((item) => ForecastWeather.fromJson(item)).toList();
+      forecast.assignAll(forecastList);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch forecast: $e');
+      log('Forecast API Failure: $e');
+      handleException(e);
+    }
+  }
+
+  void handleException(dynamic e) {
+    log('Handled Exception: $e');
+    if (e is AppException) {
+      showErrorMessage('Error ${e.message} ?? Unexpected error occurred');
+    } else {
+      showErrorMessage('Error $e');
+    }
+  }
+
+  String getWeatherAnimation(String? mainCondition) {
+    if (mainCondition == null) return 'assets/weather/sun.json';
+    switch (mainCondition) {
+      case 'clouds':
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
+      case 'fog':
+        return 'assets/weather/cloud.json';
+      case 'rain':
+      case 'drizzle':
+      case 'shower rain':
+        return 'assets/weather/rain.json';
+      case 'thunderstorm':
+        return 'assets/weather/thunder.json';
+      case 'clear':
+        return 'assets/weather/sun.json';
+      default:
+        return 'assets/weather/sun.json';
     }
   }
 

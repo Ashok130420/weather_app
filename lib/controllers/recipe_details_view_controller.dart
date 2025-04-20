@@ -50,7 +50,7 @@ class RecipeDetailsViewController extends GetxController {
   Future<void> saveToFavorites() async {
     if (recipe.value != null) {
       await DatabaseHelper.instance.insertRecipe(recipe.value!);
-      Get.find<FavoriteViewController>().onInit();
+      Get.put(FavoriteViewController()).onInit();
       showSuccessMessage("Recipe added to favorites");
     }
   }
